@@ -98,7 +98,7 @@ function connectBtnClick() {
 }
 ```
 #### Programa microbit
-[Control de movimiento con micro:bit: microbit](https://editor.p5js.org/antonellavides/full/TKwpeHvDO)
+[Control de movimiento con micro:bit: microbit](https://python.microbit.org/v/3)
 ```python
 from microbit import *
 
@@ -133,6 +133,7 @@ Inicializa la comunicación.
 Define la velocidad a la que se envían los datos en bits por segundo.
 
 ## Bitácora de reflexión
+
 
 
 
