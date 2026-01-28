@@ -16,7 +16,7 @@ Los sistemas interactivos abren las posibilidades para poder expresar el de mane
 
 ### Actividad 02
 
-> Luego de este ejercicio, define en tus propias palabras las siguientes preguntas-
+> Luego de este ejercicio, define en tus propias palabras las siguientes preguntas.
 
 #### *¿Qué es el diseño/arte generativo?*
 
@@ -42,7 +42,7 @@ El microbit muestra una carita feliz, un corazón y un mensaje de love
 
 #### *¿Por qué no funcionaba el programa con was_pressed() y por qué funciona con is_pressed()?*
 
-
+El programa no funciona con el programa `was_pressed()` porque este funciona mejor para detectar eventos únicos como un clic. En cambio el programa `is_pressed()` puede enviar múltiples mensajes al círculo si el botón se mantiene presionado.
 
 ## Bitácora de aplicación 
 
@@ -114,22 +114,26 @@ while True:
 
 #### *Funcionamiento* :shipit:
 
-- Creo la variable del puerto (port) para comunicarme con el micro:bit y también una variable x para guardar la posición horizontal del círculo.
-- createCanvas dibuja el espacio donde va el círculo.
-- createSerial() crea el objeto para la conexión serial.
+- Creo la variable del puerto `(port)` para comunicarme con el micro:bit y también una variable x para guardar la posición horizontal del círculo.
+- `createCanvas` dibuja el espacio donde va el círculo.
+- `createSerial()` crea el objeto para la conexión serial.
 - Hago un botón que me deja conectar y desconectar el micro:bit.
-- draw() se repite muchas veces por segundo para que la pagina se vaya actualizando para redibujar los fotogramas del circulo.
+- `draw()` se repite muchas veces por segundo para que la pagina se vaya actualizando para redibujar los fotogramas del circulo.
 - Si es A muevo el círculo a la izquierda y si es B lo muevo a la derecha.
-- 
+  
  #### *Extra* :octocat:
  
-**uart:** es el módulo que permite al micro:bit comunicarse por puerto serial USB.
+`uart`
+Es el módulo que permite al micro:bit comunicarse por puerto serial USB.
 
-**.init():** inicializa la comunicación.
+`.init()`
+Inicializa la comunicación.
 
-**baudrate=115200:** define la velocidad a la que se envían los datos en bits por segundo.
+`baudrate=115200`
+Define la velocidad a la que se envían los datos en bits por segundo.
 
 ## Bitácora de reflexión
+
 
 
 
