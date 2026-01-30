@@ -98,7 +98,7 @@ function connectBtnClick() {
 }
 ```
 #### Programa microbit
-[Control de movimiento con micro:bit: microbit](https://python.microbit.org/v/3)
+
 ```python
 from microbit import *
 
@@ -134,6 +134,20 @@ Define la velocidad a la que se envían los datos en bits por segundo.
 
 ## Bitácora de reflexión
 
+### Funcionamiento del sistema físico interactivo
+
+**¿Qué es este sistema físico interactivo?**
+Este sistema conecta tres niveles que trabajan juntos para transformar una acción física en una respuesta visual.
+
+En el nivel físico (hardware) se encuentra el micro:bit y el botón `A`, que es el elemento que el usuario presiona.
+En el nivel lógico (MicroPython) hay un programa que se encarga de leer el estado del botón, decidir qué mensaje enviar y transmitir esa información a través de la comunicación serial.
+Finalmente, en el nivel visual (p5.js) se desarrolla un sketch que se conecta al micro:bit por serial, lee los datos que recibe y cambia el color de un cuadrado según esa información.
+
+***Acción física → lectura digital → mensaje → interpretación → respuesta visual***
+
+Para lograr esto, en el micro:bit importo la librería microbit e inicializo la comunicación serial con `uart.init(baudrate=115200)`. El programa se ejecuta dentro de un bucle infinito que revisa constantemente el estado del botón A. Si el botón está presionado, se envía el carácter `A`; si no lo está, se envía `N`. Esto permite enviar un estado continuo y no un evento único, haciendo que la comunicación con p5.js sea más estable.
+
+En p5.js utilizo la biblioteca p5.webserial para conectarme al micro:bit. En cada frame leo los datos que llegan por el puerto serial y, según el valor recibido, cambio el color del cuadrado: rojo cuando el botón está presionado y verde cuando no lo está. De esta manera, la respuesta visual se mantiene sincronizada con la acción física del usuario.
 
 
 
