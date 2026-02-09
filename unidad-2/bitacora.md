@@ -102,17 +102,33 @@ while True:
 
 ***¿Cuáles son los estados en el programa?***
 
+`estado_waitInOn`
+
+`estado_waitInOff`
+
 ***¿Cuáles son los eventos en el programa?***
 
+`Entry`
+
+`Exit`
+
+`Timeout`
+
 ***¿Cuáles son las acciones en el programa?***
+
+`display.set_pixel(self.posx, self.posy, 9)`
+
+`self.myTimer.start()`
+
+`display.set_pixel(self.posx, self.posy, 0)`
+
+`self.myTimer.start()`
 
 ### Actividad 02
 
 > Implementando un semáforo con máquinas de estados
 
 > Vas a realizar una modificación. Cuando el semáforo esté en verde, si se presiona el botón A, el semáforo debe cambiar inmediatamente a amarillo (sin esperar a que termine el tiempo de verde). El evento que se debe postear es “A” (post_event(“A”)).
-
-> Construye la máquina de estados que modela el problema usando PlantUML. Puedes encontrar el editor aquí y la documentación básica con ejemplos aquí.
 
 `MAIN.PY`
 
@@ -238,15 +254,24 @@ class FSMTask:
             if self._state:
                 self._state(ev)
 ```
+
+
+> Construye la máquina de estados que modela el problema usando PlantUML.
+
+<img width="500" height="500" alt="Screenshot 2026-02-09 182141" src="https://github.com/user-attachments/assets/727cec75-267f-4b8b-8a84-45bbbf107a7e" />
+
+
 ### Actividad 03
+***¿Cómo es posible estructurar una aplicación usando una máquina de estados para poder atender varios eventos de manera concurrente?***
 
-
+Se estructura creando objetos independientes, cada uno con su propia máquina de estados, cola de eventos y temporizadores. El ciclo principal llama continuamente a `update()`, permitiendo procesar eventos sin bloquear el programa. Aunque hay un solo hilo, esto genera concurrencia cooperativa, ya que varias tareas avanzan casi al mismo tiempo.
 
 ## Bitácora de aplicación 
 
 
 
 ## Bitácora de reflexión
+
 
 
 
