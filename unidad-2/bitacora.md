@@ -268,16 +268,375 @@ Se estructura creando objetos independientes, cada uno con su propia máquina de
 
 ## Bitácora de aplicación 
 
+### Actividad 04
+>Temporizador interactivo con máquina de estados
+
+***PlantUML***
+
+
+<img width="500" height="500" alt="Screenshot 2026-02-12 211900" src="https://github.com/user-attachments/assets/a406f1f7-a2d0-45ac-919b-e44ec5753e06" />
+
+
+***Codigo Microbit***
+
+```python
+from microbit import *
+import utime
+import music
+
+# -------------------------------------------------
+# DISPLAY
+# -------------------------------------------------
+def make_fill_images(on='9', off='0'):
+    imgs = []
+    for n in range(26):
+        rows = []
+        k = 0
+        for y in range(5):
+            row = []
+            for x in range(5):
+                row.append(on if k < n else off)
+                k += 1
+            rows.append(''.join(row))
+        imgs.append(Image(':'.join(rows)))
+    return imgs
+
+FILL = make_fill_images()
+
+SKULL = Image(
+    "09090:"
+    "99999:"
+    "99999:"
+    "09990:"
+    "00900"
+)
+
+# -------------------------------------------------
+# TIMER (NO MODIFICAR)
+# -------------------------------------------------
+class Timer:
+    def __init__(self, owner, event, duration):
+        self.owner = owner
+        self.event = event
+        self.duration = duration
+        self.start_time = 0
+        self.active = False
+
+    def start(self, new_duration=None):
+        if new_duration:
+            self.duration = new_duration
+        self.start_time = utime.ticks_ms()
+        self.active = True
+
+    def update(self):
+        if self.active and utime.ticks_diff(utime.ticks_ms(), self.start_time) >= self.duration:
+            self.active = False
+            self.owner.post_event(self.event)
+
+# -------------------------------------------------
+# FSM
+# -------------------------------------------------
+class Task:
+
+    def __init__(self):
+        self.queue = []
+        self.timers = []
+
+        self.timer = self.createTimer("Timeout", 1000)
+
+        self.n = 20
+        self.state = None
+        self.transition(self.config)
+
+    def createTimer(self, event, duration):
+        t = Timer(self, event, duration)
+        self.timers.append(t)
+        return t
+
+    def post_event(self, ev):
+        self.queue.append(ev)
+
+    def update(self):
+        for t in self.timers:
+            t.update()
+
+        while self.queue:
+            self.state(self.queue.pop(0))
+
+    def transition(self, new_state):
+        self.state = new_state
+        self.state("ENTRY")
+
+    # ---------------- ESTADOS ----------------
+
+    # CONFIGURACION
+    def config(self, ev):
+        if ev == "ENTRY":
+            display.show(FILL[self.n])
+
+        elif ev == "A" and self.n < 25:
+            self.n += 1
+            display.show(FILL[self.n])
+
+        elif ev == "B" and self.n > 15:
+            self.n -= 1
+            display.show(FILL[self.n])
+
+        elif ev == "S":
+            self.transition(self.countdown)
+
+    # CUENTA REGRESIVA
+    def countdown(self, ev):
+        if ev == "ENTRY":
+            self.timer.start()
+
+        elif ev == "Timeout":
+            self.n -= 1
+            display.show(FILL[self.n])
+
+            if self.n == 0:
+                self.transition(self.end)
+            else:
+                self.timer.start()
+
+    # FIN
+    def end(self, ev):
+        if ev == "ENTRY":
+            display.show(SKULL)
+            music.play(music.WAWAWAWAA)
+
+        elif ev == "A":
+            self.n = 20
+            self.transition(self.config)
+
+# -------------------------------------------------
+# LOOP PRINCIPAL
+# -------------------------------------------------
+task = Task()
+
+while True:
+
+    if button_a.was_pressed():
+        task.post_event("A")
+
+    if button_b.was_pressed():
+        task.post_event("B")
+
+    if accelerometer.was_gesture("shake"):
+        task.post_event("S")
+
+    task.update()
+```
 
 
 ## Bitácora de reflexión
 
+### Actividad 05
+> Modificar el temporizador interactivo de modo que puedas controlarlo también desde p5.js además de los botones del micro:bit.
 
+***Codigo Microbit***
 
+```python
+from microbit import *
+import utime
+import music
 
+uart.init(115200)
 
+# -------------------------------------------------
+# DISPLAY
+# -------------------------------------------------
+def make_fill_images(on='9', off='0'):
+    imgs = []
+    for n in range(26):
+        rows = []
+        k = 0
+        for y in range(5):
+            row = []
+            for x in range(5):
+                row.append(on if k < n else off)
+                k += 1
+            rows.append(''.join(row))
+        imgs.append(Image(':'.join(rows)))
+    return imgs
 
+FILL = make_fill_images()
 
+SKULL = Image(
+    "09090:"
+    "99999:"
+    "99999:"
+    "09990:"
+    "00900"
+)
 
+# -------------------------------------------------
+# TIMER
+# -------------------------------------------------
+class Timer:
+    def __init__(self, owner, event, duration):
+        self.owner = owner
+        self.event = event
+        self.duration = duration
+        self.start_time = 0
+        self.active = False
+
+    def start(self, new_duration=None):
+        if new_duration:
+            self.duration = new_duration
+        self.start_time = utime.ticks_ms()
+        self.active = True
+
+    def update(self):
+        if self.active and utime.ticks_diff(utime.ticks_ms(), self.start_time) >= self.duration:
+            self.active = False
+            self.owner.post_event(self.event)
+
+# -------------------------------------------------
+# FSM
+# -------------------------------------------------
+class Task:
+
+    def __init__(self):
+        self.queue = []
+        self.timers = []
+
+        self.timer = self.createTimer("Timeout", 1000)
+
+        self.n = 20
+        self.state = None
+        self.transition(self.config)
+
+    def createTimer(self, event, duration):
+        t = Timer(self, event, duration)
+        self.timers.append(t)
+        return t
+
+    def post_event(self, ev):
+        self.queue.append(ev)
+
+    def update(self):
+        for t in self.timers:
+            t.update()
+
+        while self.queue:
+            self.state(self.queue.pop(0))
+
+    def transition(self, new_state):
+        self.state = new_state
+        self.state("ENTRY")
+
+    # -------- ESTADOS --------
+
+    def config(self, ev):
+        if ev == "ENTRY":
+            display.show(FILL[self.n])
+
+        elif ev == "A" and self.n < 25:
+            self.n += 1
+            display.show(FILL[self.n])
+
+        elif ev == "B" and self.n > 15:
+            self.n -= 1
+            display.show(FILL[self.n])
+
+        elif ev == "S":
+            self.transition(self.countdown)
+
+    def countdown(self, ev):
+        if ev == "ENTRY":
+            self.timer.start()
+
+        elif ev == "Timeout":
+            self.n -= 1
+            display.show(FILL[self.n])
+
+            if self.n == 0:
+                self.transition(self.end)
+            else:
+                self.timer.start()
+
+    def end(self, ev):
+        if ev == "ENTRY":
+            display.show(SKULL)
+            music.play(music.WAWAWAWAA)
+
+        elif ev == "A":
+            self.n = 20
+            self.transition(self.config)
+
+# -------------------------------------------------
+# LOOP
+# -------------------------------------------------
+task = Task()
+
+while True:
+
+    # botones físicos
+    if button_a.was_pressed():
+        task.post_event("A")
+
+    if button_b.was_pressed():
+        task.post_event("B")
+
+    if accelerometer.was_gesture("shake"):
+        task.post_event("S")
+
+    # mensajes desde p5.js
+    msg = uart.read()
+    if msg:
+        for c in msg:
+            letra = chr(c)
+            if letra in ["A", "B", "S"]:
+                task.post_event(letra)
+
+    task.update()
+
+```
+
+***Codigo p5.js***
+
+```js
+let serial;
+let portName = "COM3"; 
+
+function setup() {
+  createCanvas(400, 200);
+
+  serial = new p5.SerialPort();
+  serial.open(portName);
+}
+
+function draw() {
+  background(30);
+  fill(255);
+  textSize(16);
+
+  text("Control del temporizador", 80, 60);
+  text("A → UP", 140, 100);
+  text("B → DOWN", 130, 130);
+  text("S → ARM", 140, 160);
+}
+
+function keyPressed() {
+
+  if (key === 'A') {
+    serial.write('A');
+  }
+
+  if (key === 'B') {
+    serial.write('B');
+  }
+
+  if (key === 'S') {
+    serial.write('S');
+  }
+}
+
+```
+
+***Explicacion***
+
+Resolví el reto extendiendo el temporizador interactivo para que pudiera recibir eventos tanto desde los botones del micro:bit como desde `p5.js`, sin modificar la arquitectura de máquina de estados. Para lograrlo, utilicé la comunicación serial para recibir las letras `A`, `B` y `S` enviadas desde `p5.js`, simulando las acciones de subir, bajar y activar el temporizador. Cuando el micro:bit recibe estos caracteres, los convierte en eventos y los envía a la máquina de estados mediante `post_event()`, manteniendo intacta la lógica de los estados, el uso de la clase Timer y el funcionamiento general de la aplicación.
 
 
