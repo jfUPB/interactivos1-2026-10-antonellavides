@@ -733,9 +733,13 @@ function windowResized() {
 
 ## Bitácora de aplicación 
 
+Nota del profesor: esta sección no tiene evidencia del trabajo de evaluación. No asistió a su sustentación
+
+
 
 
 ## Bitácora de reflexión
+
 
 
 
